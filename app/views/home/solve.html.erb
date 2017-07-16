@@ -1,0 +1,72 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta charset="utf-8">
+    <title></title>
+  </head>
+  <body>
+    <%= form_tag '/evaluate',remote: true do %>
+    <!-- <div class="ace-editor">
+    <textarea name="source"></textarea>
+    </div> -->
+	<%= text_area_tag 'source'%>
+  <!-- <br>  <br><br><br><br><br><br><br> -->
+	<%= hidden_field_tag 'testcases',(@ques.testcases)%>
+
+  <!-- <div class="new" -->
+	<%= select_tag 'lang', options_for_select(@names.collect{ |key,value| [value, @codes[key]] }) %>
+	<%= select_tag 'format', options_for_select(["JSON","XML"]) %>
+	<%= hidden_field_tag 'api_key','hackerrank|2357374-1588|c8cb820f84f230248f9117b777b64f017d2cad2f' %>
+	<%= submit_tag 'Submit' %>
+<!-- </div> -->
+
+<% end %>
+
+<%= @val%>
+
+<!-- <%= response %> -->
+    <!-- <div class="ace-editor">
+  <textarea></textarea>
+</div> -->
+<style media="screen">
+.ace{
+position: absolute;
+color:white;
+/*float:right;*/
+background-color: black;
+height: 400px;
+width: 500px;
+top: 0;
+bottom: 0;
+left: 0;
+right: 0;
+}
+/*.new{
+  float:right;
+}*/
+
+</style>
+<script type="text/javascript">
+$(document).ready(function() {
+// initialize all Ace editors on the page.
+$(".ace-editor").each(function(index, item) {
+  initAceEditor(item);
+});
+});
+
+function initAceEditor(container) {
+container = $(container);
+var textarea = container.find("textarea");
+var aceEditorDiv = $('<div>', {
+    "class": "ace"
+}).insertBefore(textarea);
+
+var aceEditor = ace.edit(aceEditorDiv[0]);
+textarea.closest('form').submit(function() {
+  textarea.val(aceEditor.getValue());
+});
+}
+
+</script>
+  </body>
+</html>

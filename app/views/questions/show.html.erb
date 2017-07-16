@@ -1,0 +1,29 @@
+<p id="notice"><%= notice %></p>
+
+<p>
+  <strong>Content:</strong>
+  <%= @question.content %>
+</p>
+
+<p>
+  <strong>Constraints:</strong>
+  <%= @question.constraints %>
+</p>
+
+<p>
+  <strong>Testcases:</strong>
+  <%= @question.testcases %>
+</p>
+
+<p>
+  <strong>Marks:</strong>
+  <%= @question.marks %>
+</p>
+
+<p>
+  <strong>Difficulty:</strong>
+  <%= @question.difficulty %>
+</p>
+
+<%= link_to 'Edit', edit_question_path(@question) %> |
+<%= link_to 'Back', questions_path %>
