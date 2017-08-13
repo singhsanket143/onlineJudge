@@ -8,8 +8,6 @@ class HomeController < ApplicationController
   		@codes = @langs["languages"]["codes"]
       # @ques=Question.find(params[:questions_id])
       @ques=Question.where(id: params[:id]).first
-      # byebug
-      # @ques=Question.find(id)
 
   	end
 
@@ -19,9 +17,17 @@ class HomeController < ApplicationController
   		response = HTTParty.post("http://api.hackerrank.com/checker/submission.json",:body => permitted);
       @val=JSON.parse(response.body)
       # return redirect_to '/solve'
-      
-      render '/solve'
+      @rec="";
+      # render '/solve'
+      byebug
+      for i in 0...2
+        if(@val["result"]["stdout"][i]=="k\n")
+          @rec="true"
+        end
+      end
       # byebug
+
+
 
   	end
 end

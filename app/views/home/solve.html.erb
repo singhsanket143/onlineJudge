@@ -1,72 +1,259 @@
 <!DOCTYPE html>
 <html>
-  <head>
-    <meta charset="utf-8">
-    <title></title>
-  </head>
-  <body>
-    <%= form_tag '/evaluate',remote: true do %>
-    <!-- <div class="ace-editor">
-    <textarea name="source"></textarea>
-    </div> -->
-	<%= text_area_tag 'source'%>
-  <!-- <br>  <br><br><br><br><br><br><br> -->
-	<%= hidden_field_tag 'testcases',(@ques.testcases)%>
+<head>
+  <meta charset="utf-8">
+  <title></title>
+  <meta charset="utf-8">
+  <meta http-equiv="X-UA-Compatible" content="IE=edge">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/normalize/5.0.0/normalize.min.css">
 
-  <!-- <div class="new" -->
-	<%= select_tag 'lang', options_for_select(@names.collect{ |key,value| [value, @codes[key]] }) %>
-	<%= select_tag 'format', options_for_select(["JSON","XML"]) %>
-	<%= hidden_field_tag 'api_key','hackerrank|2357374-1588|c8cb820f84f230248f9117b777b64f017d2cad2f' %>
-	<%= submit_tag 'Submit' %>
-<!-- </div> -->
+  <link rel='stylesheet prefetch' href='http://maxcdn.bootstrapcdn.com/bootstrap/3.3.5/css/bootstrap.min.css'>
+  <link rel='stylesheet prefetch' href='https://cdnjs.cloudflare.com/ajax/libs/bootstrap-select/1.7.5/css/bootstrap-select.css'>
+  <style type="text/css">
+  #editor {
+    margin: 0;
+    width: 100%;
+    height: 32em;
+    margin-top: 5px;
+    font-size: 14px;
+  }
 
-<% end %>
+  /*Compile Button CSS*/
 
-<%= @val%>
+  .btn{
+    margin: 4px;
+    box-shadow: 1px 1px 5px #888888;
+  }
 
+  .btn-sky {
+    color: #fff;
+    background-color: #0bacd3;
+    border-bottom:2px solid #098aa9;
+  }
+
+  .btn-sky:hover,.btn-sky.active:focus, .btn-sky:focus{
+    color: #fff;
+    background-color: #29b6d8;
+    border-bottom:2px solid #2192ad;
+    outline: none;
+  }
+
+  .btn-sky:active, .btn-sky.active {
+    color: #fff;
+    background-color: #0a97b9;
+    border-top:2px solid #087994;
+    outline-offset: none;
+    margin-top: 2px;
+  }
+
+  .btn-sky.active:focus{
+    color: #fff;
+    background-color: #df6a78;
+    border-bottom:2px solid #b25560;
+    outline: none;
+  }
+
+  .btn:focus,
+  .btn:active:focus,
+  .btn.active:focus {
+    outline: none;
+    outline-offset: 0px;
+  }
+
+  /*Compile Button CSS End*/
+
+  .col-md-12.col-sm-12.codeSide {
+    background: #272822;
+    height: 40em;
+    padding-left: 21px;
+    border-radius: 10px;
+    padding-top: 7px;
+  }
+
+  .ace_gutter {
+    min-width: 50px;
+  }
+
+  .ace_scroller {
+    margin-left: 5px;
+  }
+
+  input#compile {
+    margin-top: 5px;
+    float: right;
+  }
+
+  /*Language Select CSS */
+  button.btn.dropdown-toggle.btn-default {
+    width: 42%;
+    margin: 4px 2px 6px 4px;
+  }
+  </style>
+</head>
+<body>
+  <!-- Editor -->
+  <%= form_tag '/evaluate',remote: true do %>
+  <div class="container">
+    <div class="row">
+      <div class="col-md-12 col-sm-12 codeSide">
+        <div class="row">
+          <div class="col-md-12 col-sm-12">
+            <div class="compile-code">
+              <!-- Language Selection -->
+              <select class="selectpicker" data-live-search="true" class="form-control" name="Language" id="mode" onchange="changeMode()">
+                <option value="c" id="c" selected>C</option>
+                <option value="c++" id="c++">C++</option>
+                <option value="python2" id="python2">Python2</option>
+                <option value="python3" id="python3">Python3</option>
+                <option value="java" id="java">Java</option>
+              </select>
+              <!-- Editor -->
+              
+              <!-- <textarea name="source"></textarea> -->
+              
+              <pre name="code" id="editor" style="border: none;"></pre> </div>
+              <input type="submit" id="compile" class="btn btn-sky text-uppercase btn-sm" value="Compile">
+              
+            </div>
+          </div>
+        </div>
+        <!-- /.col-md-12 col-sm-12 codeSide -->
+      </div>
+      <!-- /.row -->
+    </div>
+    
+    
+    <%= text_area_tag 'source'%>
+    <!-- <br>  <br><br><br><br><br><br><br> -->
+    <%= hidden_field_tag 'testcases',(@ques.testcases)%>
+
+    <!-- <div class="new" -->
+    <%= select_tag 'lang', options_for_select(@names.collect{ |key,value| [value, @codes[key]] }) %>
+    <%= select_tag 'format', options_for_select(["JSON","XML"]) %>
+    <%= hidden_field_tag 'api_key','hackerrank|2357374-1588|c8cb820f84f230248f9117b777b64f017d2cad2f' %>
+    <%= submit_tag 'Submit' ,:class=>"but"%>
+    <!-- </div> -->
+
+    <% end %>
+
+    <script src='http://cdnjs.cloudflare.com/ajax/libs/jquery/2.1.3/jquery.min.js'></script>
+    <script src='http://maxcdn.bootstrapcdn.com/bootstrap/3.3.5/js/bootstrap.min.js'></script>
+    <script src='https://cdnjs.cloudflare.com/ajax/libs/bootstrap-select/1.7.5/js/bootstrap-select.js'></script>
+    <script src='https://ajaxorg.github.io/ace-builds/src-min-noconflict/ace.js'></script>
+    <script type="text/javascript">
+// Editor Settings (Provided by C9)
+var editor = ace.edit("editor");
+editor.setTheme("ace/theme/monokai");
+editor.setShowPrintMargin(false);
+editor.session.setMode("ace/mode/c_cpp");
+editor.setValue("#include <stdio.h>\n\n\nint main() {\n    // Complete the code.\n    return 0;\n}\n");
+editor.clearSelection();
+
+// Function to change the mode of the editor as a different language is selected dynamically
+function changeMode() {
+  var x = document.getElementById("mode");
+  var modeValue = x.options[x.selectedIndex].value;
+  if (modeValue == "c") {
+    editor.session.setMode("ace/mode/c_cpp");
+    editor.setValue("#include <stdio.h>\n\n\nint main() {\n    // Complete the code.\n    return 0;\n}\n");
+    editor.clearSelection();
+    document.getElementById('langExt').innerHTML = "c";
+  }
+  if (modeValue == "c++") {
+    editor.session.setMode("ace/mode/c_cpp");
+    editor.setValue("#include <iostream>\nusing namespace std;\n\nint main() {\n    // Complete the code.\n    return 0;\n}\n");
+    editor.clearSelection();
+    document.getElementById('langExt').innerHTML = "cpp";
+  }
+  if (modeValue == "python2") {
+    editor.session.setMode("ace/mode/python");
+    editor.setValue("# Enter your code here. Read input from STDIN. Print output to STDOUT");
+    editor.clearSelection();
+    document.getElementById('langExt').innerHTML = "py";
+  }
+  if(modeValue == "python3") {
+    editor.session.setMode("ace/mode/python");
+    editor.setValue("# Enter your code here. Read input from STDIN. Print output to STDOUT");
+    editor.clearSelection();
+    document.getElementById('langExt').innerHTML = "py";
+  }
+  if (modeValue == "java") {
+    editor.session.setMode("ace/mode/java");
+    editor.setValue("import java.io.*;\n\nclass Main {\n\n    public static void main(String[] args) {\n        // Your code goes here\n   }\n}\n");
+    editor.clearSelection();
+    document.getElementById('langExt').innerHTML = "java";
+  }
+}
+function changeMode1() {
+  var x = document.getElementById("theme");
+  var modeValue = x.options[x.selectedIndex].value;
+  if (modeValue == "monokai") {
+    editor.setTheme("ace/theme/monokai");
+    
+  }
+  
+  if (modeValue == "eclipse") {
+    editor.setTheme("ace/theme/eclipse");
+    
+  }
+  if (modeValue == "merbivore") {
+    editor.setTheme("ace/theme/merbivore");
+    
+  }
+}
+
+$(document).ready(function() {
+  $('.selectpicker').selectpicker();
+    // $('.selectpicker1').selectpicker1();
+    $('[data-toggle="tooltip"]').tooltip(); 
+  });
+</script>
 <!-- <%= response %> -->
     <!-- <div class="ace-editor">
   <textarea></textarea>
 </div> -->
 <style media="screen">
-.ace{
-position: absolute;
-color:white;
-/*float:right;*/
-background-color: black;
-height: 400px;
-width: 500px;
-top: 0;
-bottom: 0;
-left: 0;
-right: 0;
+
+.ace {
+  position: absolute;
+  color: white;
+  /*float:right;*/
+  background-color: black;
+  height: 400px;
+  width: 500px;
+  top: 0;
+  bottom: 0;
+  left: 0;
+  right: 0;
 }
-/*.new{
+      /*.new{
   float:right;
-}*/
+  }*/
 
-</style>
-<script type="text/javascript">
-$(document).ready(function() {
-// initialize all Ace editors on the page.
-$(".ace-editor").each(function(index, item) {
-  initAceEditor(item);
-});
-});
+  </style>
+  <script type="text/javascript">
+  $(document).ready(function () {
+        // initialize all Ace editors on the page.
+        $("#editor").each(function (index, item) {
+          initAceEditor(item);
+        });
+      });
+  var editor = ace.edit("editor");
+  function initAceEditor(container) {
+    $(".but").click(function(){
+      var textarea = $("#source").val();
+      $("#source").val(editor.getValue());
+    })
+        // container = $(container);
+        // var textarea = $(this).find("textarea[name="source"]");
+        // var aceEditorDiv = $('<div>', {"class": "ace"}).insertBefore(textarea);
 
-function initAceEditor(container) {
-container = $(container);
-var textarea = container.find("textarea");
-var aceEditorDiv = $('<div>', {
-    "class": "ace"
-}).insertBefore(textarea);
-
-var aceEditor = ace.edit(aceEditorDiv[0]);
-textarea.closest('form').submit(function() {
-  textarea.val(aceEditor.getValue());
-});
+        // var aceEditor = ace.edit(aceEditorDiv[0]);
+        // textarea.closest('form').submit(function () {
+        //   textarea.val(aceEditor.getValue());
+        // });
 }
-
 </script>
-  </body>
+</body>
 </html>
